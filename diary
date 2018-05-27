@@ -1,0 +1,167 @@
+#include <iostream>
+#include <fstream>
+#include <string.h>
+using namespace std;
+
+fstream file;
+int sel;					//選項 
+class dnode{
+	public:
+  
+	char date[20];           //日期 
+	char info[100];          //日記內容 
+	char name[100];          //日記名稱 
+	char allcontent[2000];   //全部的日記 
+	char mix[150];           //這一篇日記寫入的內容 
+	int com, datanum;
+};
+
+dnode fs;
+
+class diary{
+public:
+	
+void menu(){
+	cout<<"請選擇動作"<<endl<<"(1)寫日記(2)讀日記(3)觀看/修改檔案名稱(4)離開"<<endl;
+	cin>>sel; 
+}
+
+
+void write_diary(){
+	cout<<"請輸入要存的檔案名稱"<<endl;
+	cin>>fs.name;
+	
+	cout<<"請輸入要寫紀錄的日期(yyyy-mm-dd)"<<endl;
+	cin>>fs.date;
+	
+	strcat(fs.mix,fs.date);
+	strcat(fs.mix,",");
+	
+	cout<<"請輸入要寫入日記的內容"<<endl;
+	cin>>fs.info;
+	
+	strcat(fs.mix,fs.info);
+	strcat(fs.mix,"\n");
+	
+	cout<<"是否再做一次寫日記 <要：Y/不要：N>"<<endl;
+	cin>>selagain;
+}
+
+ 
+ void key_in()
+ {
+ 	size_t num_1=strlen(fs.mix);
+ 	file.open(fs.name,ios::app);
+ 	file.write(fs.mix,num_1);
+ 	
+ 	file.close();
+ 	
+ 	for(int i=0; i<2000; i++)
+ 	{
+ 		fs.mix[i]=0;
+	 }
+ }
+
+
+void read_diary()
+{
+	cout<<"請輸入檔案名稱"<<endl;
+	cin>>fs.name;
+	file.open(fs.name,ios::in);
+	cout<<"日記內容\n\n";
+	
+	while( file.getline(fs.allcontent,sizeof(fs.allcontent), ',') ){
+	cout<<fs.allcontent<<endl;
+	fs.com++;
+	}
+	
+	file.close();
+	fs.datanum=fs.com/2;
+	memset (fs.allcontent,'\0',sizeof(fs.allcontent) );
+	cout<<"是否再做一次讀日記 <要：Y/不要：N>"<<endl;
+	cin>>selagain;
+}
+
+
+int askagain(){
+	if(selagain=='y'||selagain=='Y')
+	return 1;
+	
+	else if(selagain=='n'||selagain=='N')
+	return 0;
+}
+
+
+int changename(){
+	char newname[100];
+	char choice;
+	
+	if(fs.name[0]=='\0'){
+		cout<<"請選擇動作：(A)新增檔案名稱(B)回上一層"<<endl;
+		cin>>choice;
+		
+		if(choice=='A'||choice=='a'){
+			cout<<"請輸入新檔案的名稱"<<endl;
+			cin>>newname;
+			file.open(newname, ios::out);
+			file.close(); 
+		} 
+		
+		if(choice=='B'||choice=='b'){}
+	}
+	
+	else{
+		cout<<"請選擇動作：(A)修改檔案名稱(B)回上一層"<<endl;
+		cin>>choice;
+		
+		if(choice=='A'||choice=='a'){
+			cout<<"目前檔案名稱："<<fs.name<<endl;
+			cout<<"請輸入新的檔案名稱："<<endl;
+			cin>>newname;
+			rename(fs.name,newname);
+			cout<<"修改完成"<<endl; 
+		} 
+		
+		if(choice=='B'||choice=='b'){}
+	}
+	return 0;
+}
+
+private:
+char selagain;
+};
+
+diary hw;
+
+int main()
+{
+	do{
+		hw.menu();
+		
+	if(sel==1){
+		do{
+		hw.write_diary();
+		hw.key_in();
+		}
+		
+		while(hw.askagain());
+	}
+	
+	
+	if(sel==2){
+		do
+		hw.read_diary();
+	
+		while(hw.askagain());
+	}
+	
+	
+	if(sel==3){
+		do
+		hw.changename();
+		
+		while(hw.changename());
+	}
+	
+	}while(sel!=4);
+}
